@@ -1,0 +1,105 @@
+# GraphFusion AI Docker Compose - Full Stack
+# Starts: OpenSearch, Neo4j, GraphFusion API, and Streamlit UI
+#
+# Required: create a .env file from .env.example and fill in Azure OpenAI credentials.
+# Set NEO4J_PASSWORD and OPENSEARCH_PASSWORD in .env before running.
+
+version: '3.8'
+
+services:
+  # OpenSearch - Vector Search Engine
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: graphfusion-opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "127.0.0.1:9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - graphfusion-network
+
+  # Neo4j - Graph Database
+  neo4j:
+    image: neo4j:5.26
+    container_name: graphfusion-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j-data:/data
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - graphfusion-network
+
+  # GraphFusion API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: graphfusion-api
+    env_file:
+      - .env
+    environment:
+      - OPENSEARCH_HOST=http://opensearch:9200
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - graphfusion-network
+
+  # Streamlit UI
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: graphfusion-ui
+    environment:
+      - API_URL=http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - graphfusion-network
+
+volumes:
+  opensearch-data:
+  neo4j-data:
+
+networks:
+  graphfusion-network:
+    driver: bridge

@@ -1,50 +1,69 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# GraphFusion_AI Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Core Architecture Principle
+The system must follow an intent-aware hybrid retrieval architecture combining vector and graph-based reasoning.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All queries must be routed dynamically based on intent:
+- Semantic → Vector retrieval
+- Relationship → Graph retrieval
+- Hybrid → Combined retrieval
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Technology Constraint
+- **Python**: 3.12+ required; use built-in generics (`list`, `dict`, `X | None`) — no `typing.List/Dict/Optional`
+- Vector DB: OpenSearch (POC), replaceable with AWS OpenSearch
+- Graph DB: Neo4j (POC), replaceable with Neptune
+- Backend: FastAPI
+- UI: Streamlit
+- LLM: Azure OpenAI
+- RAG Engine: LlamaIndex
+- Orchestration: Keep the POC minimal; add orchestration frameworks only when needed
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### III. Deployment Rule
+The system must be deployable locally using containerized services for POC.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All components must be loosely coupled to allow migration to managed cloud services without refactoring.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### IV. Data Ingestion Principle
+All ingested data must support dual indexing:
+- Vector embeddings for semantic retrieval
+- Graph representation for relationship reasoning
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+Entity and document linkage should be possible across both stores (POC may be approximate).
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Image/diagram handling must be explicit:
+- OCR mode extracts raw text from images
+- VLM mode extracts structured entities/relationships from images and converts them into text that is appended to document content for downstream ingestion
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Performance & Behavior Rules
+- Default retrieval must NOT always be hybrid (cost optimization)
+- Intent detection is mandatory before retrieval
+- System must return explainable responses (source + reasoning type)
+
+## Additional Constraints
+
+### Security Requirements
+- **NEVER** commit `.env` files or secrets to version control
+- All credentials must be loaded from environment variables
+- API keys must be validated at startup with clear error messages
+- Temporary files from uploads must be cleaned up after processing
+- Default/local passwords used for Docker demo are acceptable for a POC, but must be called out clearly as non-production defaults
+
+### Code Quality Standards
+- Dead code and unused file references must be removed promptly
+- Task and spec files must reflect actual implementation
+- Module structure should be flat and pragmatic (avoid over-engineering)
+
+Technology stack requirements, compliance standards, deployment policies, etc.
+
+## Development Workflow
+
+Code review requirements, testing gates, deployment approval process, etc.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+Constitution supersedes all other practices; Amendments require documentation, approval, migration plan
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.2 | **Ratified**: 2026-04-23 | **Last Amended**: 2026-04-26
