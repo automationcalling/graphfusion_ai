@@ -4,6 +4,12 @@
 
 > **Status**: POC / Learning project — not production-ready. No benchmarks yet. Contributions welcome.
 
+## About
+
+**GraphFusion AI** is an intent-aware hybrid RAG POC that fuses **vector search** (OpenSearch) with **graph reasoning** (Neo4j). It includes document ingestion (LlamaIndex), a FastAPI query API, a Streamlit UI, and Azure OpenAI for embeddings + answer synthesis.
+
+**Suggested GitHub topics:** `rag`, `hybrid-search`, `retrieval-augmented-generation`, `knowledge-graph`, `graph-rag`, `neo4j`, `opensearch`, `llamaindex`, `fastapi`, `streamlit`, `azure-openai`, `embeddings`, `intent-detection`, `document-ingestion`, `ocr`
+
 GraphFusion demonstrates a hybrid RAG architecture that routes queries by intent and fuses results from multiple retrieval sources:
 
 - **Intent detection** classifies queries as semantic, relationship, or hybrid
